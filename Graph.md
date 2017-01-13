@@ -59,8 +59,32 @@ bool Bellman_Ford(s)
 }
 ```
 ##spfa
-```
-
+```c++
+bool spfa(int s){
+  memset(d,INF,sizeof(d));
+  memset(inq,false,sizeof(inq));
+  memset(cnt,0,sizeof(cnt));
+  queue<int> Q;
+  Q.push(s);
+  d[s] = 0;
+  inq[s] = true;
+  while(!Q.empty())
+  {
+    int u = Q.front();
+    inq[u] = false;
+    for(int i=0 ; i<G[u].size() ; ++i){
+      Edge &e = E[G[u][i]];
+      if(d[e.to]>d[e.from]+e.weight){
+        d[e.to] = d[e.from]+e.weight;
+        if(!inq[e.to]){
+          Q.push(e.to);inq[e.to] = true;
+          if(++cnt[e.to]>n-1)return false;
+        }
+      }
+    }
+  }
+  return true;
+}
 ```
 #次短路
 
@@ -109,4 +133,25 @@ int kruskal(){
     return res;
 }
 
+```
+#所有节点对的最短路
+```
+void floyd(){
+  for(int k=1 ; k<=nv ; ++k)
+    for(int i =1 ; i<=nv ; ++i)
+      for(int j=1 ; j<=nv ; ++j){
+        d[i][j] = min(d[i][j],d[i][k]+d[k][j]);
+      }
+}
+```
+##传递闭包
+上面的算法稍微修改以下就可以求传递传递闭包了。
+```c++
+void floyd(){
+  for(int k=1 ; k<=nv ; ++k)
+    for(int i =1 ; i<=nv ; ++i)
+      for(int j=1 ; j<=nv ; ++j){
+        d[i][j] |=d[i][k]&d[k][j];
+      }
+}
 ```
