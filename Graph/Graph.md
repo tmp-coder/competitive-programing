@@ -155,3 +155,38 @@ void floyd(){
       }
 }
 ```
+#割点和桥
+```c++
+//判断重边可以开个map来判断.然后置为-1
+int dfs_clock = 0;//时间戳
+int pre[maxn];//顶点的访问顺序
+int low[maxn];//子树的最低访问时间
+int cut[maxn];//割点后能增加的联通分量数
+void init(){
+    memset(pre,0,sizeof(pre));
+    memset(cut,0,sizeof(cut));
+    dfs_clock = 0;
+}
+//只能跑一个连通分量中的割点
+void dfs(int u,int fa){
+    low[u] = pre[u] = ++dfs_clock;
+    int cl = 0;//孩子数目
+    for(int i=0 ; i<G[u].size() ; ++i){
+        Edge & e = E[G[u][i]];
+        int v = e.to;
+        if(no_use[v])continue;
+        if(!pre[v]){
+            cl++;
+            dfs(v,u);
+            low[u]= min(low[u],low[v]);
+            //判断割点
+            if(low[v] >= pre[u])cut[u]++;//增加(u,v)的联通集
+            //判断割边
+            if(low[v] > pre[u] && e.qiao !=-1)e.qiao = 1;
+        }else if(pre[v] < pre[u] && v != fa){
+            low[u] = min(low[u],pre[v]);
+        }
+    }
+    if(fa == -1 && cl == 1)cut[u] = 0;//根节点
+}
+```
