@@ -190,3 +190,236 @@ void dfs(int u,int fa){
     if(fa == -1 && cl == 1)cut[u] = 0;//根节点
 }
 ```
+# 强联通分量分解
+```c++
+
+
+
+std::vector<int> G[MAX_V];
+std::vector<int> rG[MAX_V];
+bool vis[MAX_V];
+int scc[MAX_V];
+std::vector<int> vs;//访问结束时间栈
+void add_edge(int u,int v){
+  G[u].push_back(v);
+  G[v].push_back(u);
+}
+void dfs(int u) {
+  vis[u] = true;
+  for(int i=0 ; i<G[u].size() ;++i)
+    if(!vis[G[u][i]])dfs(G[u][i]);
+  vs.push_back(u);
+}
+
+void rdfs(int u,int scc_cnt) {
+  vis[u] = true;
+  scc[u] = scc_cnt;
+  for(int i=0 ; i<rG[u].size() ; ++i)
+    if(!vis[rG[u][i]])rdfs(rG[u][i]);
+}
+
+int Kosaraju(int nv){
+  int scc_cnt = 0;
+  memset(vis,false,sizeof(vis));
+  vs.clear();
+  for(int i=0 ; i<v ; ++i)
+    if(!vis[i])dfs(i);
+  memset(vis,false,sizeof(vis));
+  for(int i= vs.size()-1 ; i>=0 ; --i)
+    if(!vis[vs[i]])rdfs(vs[i],++scc_cnt);
+  return scc_cnt;
+}
+
+```
+# 网络流
+##Dinic
+```c++
+
+struct Edge{
+  int from,to,cap;
+  Edge(int u,int v,int c = 0):from(u),to(v),cap(c){};
+};
+
+//残量网络
+void add_edge(int u,int v,int cap){
+  E.push_back(Egde(u,v,cap));G[u].push_back(E.size()-1);
+  E.push_back(Edge(v,u,0));  G[v].push_back(E.size()-1);
+}
+
+struct Dinic{
+  std::vector<Edge> E;
+  std::vector<int> G[MAX_V];
+  int level[MAX_V],cur[MAX_V];//分层，当前弧；
+  void bfs(int s){
+    memset(level,-1,sizeof(level));
+    queue<int> Q;Q.push(s);
+    level[s] = 0;
+    while (!Q.empty()) {
+      int u = Q.front();Q.pop();
+      for(int i=0 ; i<G[u].size() ; ++i){
+        Edge & e = E[G[u][i]];
+        if(e.cap>0 && level[e.to]<0){
+          level[e.to] = level[u]+1;
+          Q.push(e.to);
+        }
+      }
+    }
+  }
+
+  int dfs(int v,int t,int f){
+    if(v==t || f == 0)return f;
+    for(int& i = cur[v] ; i<G[v].size() ; ++i){
+      Edge & e = E[G[v][i]];Edge & rev = E[G[v][i]^1];
+      if(e.cap>0 && level[v]<level[e.to]){
+        int a = dfs(e.to,t,min(f,e.cap));
+        if(a>0){
+          e.cap-=a;
+          rev.cap+=a;
+          return a;
+        }
+      }
+    }
+    return 0;
+  }
+
+  int max_flow(int s,int t){
+    int flow = 0;
+    for(;;){
+      bfs(s);
+      if(level[t]<0)break;
+      memset(cur,0,sizeof(cur));
+      int f;
+      while ((f = dfs(s,t,INF))>0) {
+        flow+=f;
+      }
+    }
+    return flow;
+  }
+}
+
+```
+对于上面的建边的方式,e的反向边就是e^1,这个可以自行枚举证明.
+
+##最大流最小切割定理
+以下三个条件等价:
+1. $f$ 是 $G$ 的最大流.
+2. 残存网络中没有增广路
+3. $|f| = c(S,T)$ 其中(S,T)是最小切割
+
+###切割
+
+$G$的某个切割 $\{S,T\}$ 是指，将图分为两个不相交的集合，$\{S,T\}$ 的容量为，从 ${S}$ d到 $T$ 的最大容量，即割边的最大容量
+
+#二分图匹配
+二分图的一个匹配是指二分图中的一些没有公共顶点的边集，匹配数就是边集的数目，最大匹配是指，使得这样的边集的数目最大.
+
+##算法
+当作网络流来处理，将$U 与 V$ 的边改成从 $U 流入 V$ 的一条边，其容量为一.对于这个多元多汇问题，我们只需要连一个超级节点 $S$ 到每一个源点，容量为1，再从每一个汇点连到一个超级汇点 容量也为一，这样这个图的最大流就是最大匹配数.
+
+不过由于是二分图我们可不必真的这样实现
+
+**Code**
+```c++
+int V;
+std::vector<int> G[MAX_V];
+bool used[MAX_V];
+int match[MAX_V];
+
+bool dfs(int u){
+  used[u] = true;
+  for(int i=0 ; i<G[u].size() ; ++i){
+    int v = G[u][i];int w = match[v];
+    if(w<0 || !used[w] && dfs(w)){
+      match[u] = v;match[v] = u;
+      return true;
+    }
+  }
+  return false;
+}
+
+int bipartite_match(){
+  int res = 0;
+  memset(match,-1,sizeof(match));
+  for(int i = 1 ; i<=V ; ++i){
+    if(match[i]<0){
+      memset(used,false,sizeof(used));
+      if(dfs(i))res++;
+    }
+  }
+  return res;
+}
+
+void add_edge(int u,int v){
+  G[u].push_back(v);
+  G[v].push_back(u);
+}
+```
+
+#最小费用流
+在概念上最小费用流只是在最大流的边上在附加一个费用，即求出从源点到汇点的给定流量的最小费用.
+
+##算法
+先从源点找一条到汇点的最短路，然后沿着最短路增广.建图的时候将反向边的费用设为-cost.(退流退费用)
+
+**Code**
+
+```c++
+struct Edge{
+  int from,to,cap,cost;
+  Edge(int f,int t,int c,int co):from(f),to(t),cap(c),cost(co){}
+};
+std::vector<Edge> E;
+std::vector<int> G[MAX_V];
+void add_edge(int u,int v,int cap,int cost){
+  E.push_back(Edge(u,v,cap,cost));G[u].push_back(E.size()-1);
+  E.push_back(Edge(v,u,0,-cost)) ;G[v].push_back(E.size()-1);
+}
+struct MCMF{
+  int V;
+  int dist[MAX_V];
+  int pre_E[MAX_V];//最短路径弧
+  bool inq[MAX_V];//spfa判断
+  //未判断负圈
+  void spfa(int s){
+    memset(dist,INF,sizeof(dist));
+    memset(inq,false,sizeof(inq));
+    queue<int> Q;
+    Q.push(s);
+    dist[s] = 0;
+    inq[s] = true;
+    pre_E[s] = -1;
+    while(!Q.empty())
+    {
+      int u = Q.front();Q.pop();
+      inq[u] = false;
+      for(int i=0 ; i<G[u].size() ; ++i){
+        Edge &e = E[G[u][i]];
+        if(e.cap>0&&dist[e.to]>dist[u]+e.cost){
+          dist[e.to] = dist[u]+e.cost;
+          pre_E[e.to] = G[u][i];
+          if(!inq[e.to]){Q.push(e.to);inq[e.to] = true;}
+        }
+      }
+    }
+  }
+
+  int min_cost_flow(int s,int t,int f){
+    int res = 0;
+    while (f>0) {
+      spfa(s);
+      if(dist[t]==INF)return break;//不能增广
+      //沿着最短路增广
+      int d = f;
+      for(int i = pre_E[t] ; i!=-1 ;i = pre_E[E[i].from])d = min(d,E[i].cap);
+      f-=d;
+      res+=d*dist[t];
+      for(int i = pre_E[t] ; i!=-1 ;i = pre_E[E[i].from]){
+        E[i].cap-=d;
+        E[i^1].cap+=d;
+      }
+    }
+    return res;
+  }
+};
+
+```
