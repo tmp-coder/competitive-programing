@@ -155,7 +155,28 @@ void floyd(){
       }
 }
 ```
-#割点和桥
+# 若干和dfs相关的算法
+
+##　二分图判定
+```c++
+std::vector<int> G[maxn];//G[u][i]表示第ｉ个邻居
+
+int color[maxn];//0:未着色,1:黑色,2:白色.
+//同找奇环
+bool bipartite(int u){
+    //仿照dfs
+    for(auto v: G[u]){
+        if(color[v]==color[u])return false;
+        if(!color[v]){
+            color[v] = 3-color[u]//对立颜色
+            if(!bipartite(v))return false;
+        }
+    }
+    return true;
+}
+```
+
+## 割点和桥
 ```c++
 //判断重边可以开个map来判断.然后置为-1
 int dfs_clock = 0;//时间戳
@@ -187,6 +208,61 @@ void dfs(int u,int fa){
         }
     }
     if(fa == -1 && cl == 1)cut[u] = 0;//根节点
+}
+```
+## 双连通分量bcc
+```c++
+std::vector<int> G[maxn];
+int dfs_clock = 0;//时间戳
+int pre[maxn];//顶点的访问顺序
+int low[maxn];//子树的最低访问时间
+int cut[maxn];//割点后能增加的联通分量数
+int bcc_cnt;
+std::vector<int> bcc[maxn];//双连通分量点集
+int bcc_no[maxn];//每个点的临时编号
+
+stack<Pair> S;
+
+void init(){
+    memset(pre,0,sizeof(pre));
+    memset(cut,0,sizeof(cut));
+    dfs_clock = 0;
+    bcc_cnt = 0;
+    memset(bcc_no,0,sizeof(bcc_no));
+}
+//求双连通分量
+void dfs(int u,int fa){
+    low[u] = pre[u] = ++dfs_clock;
+    int cl =0;
+    for(auto v : G[u]){
+        Pair e = mp(u,v);
+        if(!pre[v]){
+            ++cl;
+            S.push(e);
+            dfs(v,u);
+            low[u] = min(low[u],low[v]);
+            if(low[v]>=pre[u]){
+                cut[u]++;//割点
+                ++bcc_cnt;bcc[bcc_cnt].clear();
+                while (true) {
+                    Pair x = S.top();S.pop();
+                    if(bcc_no[x.fi] != bcc_cnt){bcc[bcc_cnt].pb(x.fi);bcc_no[x.fi] = bcc_cnt;}
+                    if(bcc_no[x.se]!= bcc_cnt){bcc[bcc_cnt].pb(x.se);bcc_no[x.se] = bcc_cnt;}
+                    if(x == e)break;
+                }
+            }
+        }else if(pre[v]<pre[u] && v!=fa){
+            S.push(e);
+            low[u] = min(low[u],pre[v]);
+        }
+    }
+    if(fa<0 && cl==1)cut[u] = 0;//根节点
+}
+
+void get_bcc(int n){
+    for(int i=0 ; i<n ; ++i){
+        if(!pre[i])dfs(i,-1);
+    }
 }
 ```
 # 强联通分量分解
