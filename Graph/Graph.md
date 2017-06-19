@@ -174,7 +174,6 @@ void dfs(int u,int fa){
     for(int i=0 ; i<G[u].size() ; ++i){
         Edge & e = E[G[u][i]];
         int v = e.to;
-        if(no_use[v])continue;
         if(!pre[v]){
             cl++;
             dfs(v,u);
