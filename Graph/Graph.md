@@ -306,6 +306,45 @@ int Kosaraju(int nv){
 }
 
 ```
+
+# 强联通分量tarjan版
+一定有scc[i]>scc[j]则缩点之后一定有i->j
+
+
+```c++
+std::vector<int> G[maxn];
+
+int pre[maxn],low[maxn];
+int dfs_clock;
+int scc[maxn],scc_cnt;
+
+stack<int> S;//辅助栈
+
+void dfs(int u) {
+    low[u] = pre[u] = ++dfs_clock;
+    S.push(u);
+    for(auto v:G[u]){
+        if(!pre[v]){
+            //未访问
+            dfs(v);
+            low[u] = min(low[v],low[u]);
+        }else if(!scc[v])low[u] = min(low[v],low[u]);
+    }
+
+    //计算出low值之后看是否满足起始条件
+    if(low[u] == pre[u]){
+        //标记
+        scc_cnt++;
+        while (true) {
+            int v = S.top();S.pop();
+            scc[v] = scc_cnt;
+            if(v == u)break;
+        }
+    }
+}
+```
+
+
 # 网络流
 ##Dinic
 ```c++
