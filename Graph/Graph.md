@@ -1,5 +1,6 @@
 总结一下图论算法的模板
-#图的储存
+# 图的储存
+
 临接表，用这种方法比"链式前向星"，好，主要是写起来简单，而且在空间上的效率是一样的 $O(|V|+|E|)$
 ```c++
 int ne,nv;
@@ -14,9 +15,10 @@ void add_edge(int u,int v,int w){
   G[u].push_back(E.size()-1);
 }
 ```
-#最短路
+# 最短路
 
-##dijkstra
+## dijkstra
+
 在没有负边的时候使用，$O(|E|lg|V|)$
 ```c++
 void dijkstra(int s){
@@ -41,7 +43,8 @@ void dijkstra(int s){
 }
 
 ```
-##Bellman_Ford
+## Bellman_Ford
+
 实现简单，复杂度 $O(|V|*|E|)$
 ```c++
 bool Bellman_Ford(s)
@@ -58,7 +61,8 @@ bool Bellman_Ford(s)
   return true;
 }
 ```
-##spfa
+## spfa
+
 ```c++
 bool spfa(int s){
   memset(d,INF,sizeof(d));
@@ -86,9 +90,10 @@ bool spfa(int s){
   return true;
 }
 ```
-#次短路
+# 次短路
 
-##dijkstra
+## dijkstra
+
 仿照求最短路，我们记录一下他的次短路，再做相应的更新，（允许重复走，所以肯定有次短路）
 ```c++
 void dijkstra2(int s){
@@ -118,7 +123,8 @@ void dijkstra2(int s){
   }
 }
 ```
-#最小生成树
+# 最小生成树
+
 ```c++
 int kruskal(){
     sort(E.begin(),E.end());
@@ -134,7 +140,8 @@ int kruskal(){
 }
 
 ```
-#所有节点对的最短路
+# 所有节点对的最短路
+
 ```
 void floyd(){
   for(int k=1 ; k<=nv ; ++k)
@@ -144,7 +151,8 @@ void floyd(){
       }
 }
 ```
-##传递闭包
+## 传递闭包
+
 上面的算法稍微修改以下就可以求传递传递闭包了。
 ```c++
 void floyd(){
@@ -177,6 +185,7 @@ bool bipartite(int u){
 ```
 
 ## 割点和桥
+
 ```c++
 //判断重边可以开个map来判断.然后置为-1
 int dfs_clock = 0;//时间戳
@@ -211,6 +220,7 @@ void dfs(int u,int fa){
 }
 ```
 ## 双连通分量bcc
+
 ```c++
 std::vector<int> G[maxn];
 int dfs_clock = 0;//时间戳
@@ -266,6 +276,7 @@ void get_bcc(int n){
 }
 ```
 # 强联通分量分解
+
 ```c++
 
 
@@ -308,6 +319,7 @@ int Kosaraju(int nv){
 ```
 
 # 强联通分量tarjan版
+
 一定有scc[i]>scc[j]则缩点之后一定有i->j
 
 
@@ -346,7 +358,9 @@ void dfs(int u) {
 
 
 # 网络流
-##Dinic
+
+## Dinic
+
 ```c++
 
 struct Edge{
@@ -414,25 +428,27 @@ struct Dinic{
 ```
 对于上面的建边的方式,e的反向边就是e^1,这个可以自行枚举证明.
 
-##最大流最小切割定理
+## 最大流最小切割定理
+
 以下三个条件等价:
 1. $f$ 是 $G$ 的最大流.
 2. 残存网络中没有增广路
 3. $|f| = c(S,T)$ 其中(S,T)是最小切割
 
-###切割
+### 切割
 
 $G$的某个切割 $\{S,T\}$ 是指，将图分为两个不相交的集合，$\{S,T\}$ 的容量为，从 ${S}$ d到 $T$ 的最大容量，即割边的最大容量
 
-#二分图匹配
+# 二分图匹配
 二分图的一个匹配是指二分图中的一些没有公共顶点的边集，匹配数就是边集的数目，最大匹配是指，使得这样的边集的数目最大.
 
-##算法
+## 算法
 当作网络流来处理，将$U 与 V$ 的边改成从 $U 流入 V$ 的一条边，其容量为一.对于这个多元多汇问题，我们只需要连一个超级节点 $S$ 到每一个源点，容量为1，再从每一个汇点连到一个超级汇点 容量也为一，这样这个图的最大流就是最大匹配数.
 
 不过由于是二分图我们可不必真的这样实现
 
 **Code**
+
 ```c++
 int V;
 std::vector<int> G[MAX_V];
@@ -469,10 +485,10 @@ void add_edge(int u,int v){
 }
 ```
 
-#最小费用流
+# 最小费用流
 在概念上最小费用流只是在最大流的边上在附加一个费用，即求出从源点到汇点的给定流量的最小费用.
 
-##算法
+## 算法
 先从源点找一条到汇点的最短路，然后沿着最短路增广.建图的时候将反向边的费用设为-cost.(退流退费用)
 
 **Code**
