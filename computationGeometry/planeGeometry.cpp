@@ -1,3 +1,4 @@
+#define dcmp(x) (fabs(x) < eps? 0:((x) <0?-1:1))
 struct Point{
     double x,y;
     Point(double _x=0,double _y=0):x(_x),y(_y){}
