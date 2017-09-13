@@ -6,13 +6,16 @@
 int ne,nv;
 struct Edge{
   int from,to,weight;
-  Edge(int u,int v,int w):from(u),to(v),weight(w){};
+  Edge(int u=0,int v=0,int w=0):from(u),to(v),weight(w){};
 };
-std::vector<Edge> E;
+
+int tot=0;
+Edge E[maxn*2];
 std::vector<int> G[MAX_V];
+int dist[MAX_V];
 void add_edge(int u,int v,int w){
-  E.push_back(Edge(u,v,w));
-  G[u].push_back(E.size()-1);
+  E[tot++] = Edge{u,v,w};
+  G[u].push_back(tot-1);
 }
 ```
 # 最短路
@@ -22,12 +25,12 @@ void add_edge(int u,int v,int w){
 在没有负边的时候使用，$O(|E|lg|V|)$
 ```c++
 void dijkstra(int s){
-  priority_queue<PII,std::vector<PII> ,greater<PII> > pq;
+  priority_queue<Pair,std::vector<Pair>  > pq;
   memset(dist,INF,sizeof(dist));
-  pq.push(PII(0,s));
+  pq.push(Pair(0,s));
   dist[s] = 0;
   while (!pq.empty()) {
-    PII p = pq.top();pq.pop();
+    Pair p = pq.top();pq.pop();
     int d = p.fi,u = p.se;
     if(dist[u]<d)continue;
     for(int i=0 ; i<G[u].size() ; ++i)
@@ -36,7 +39,7 @@ void dijkstra(int s){
       int v = E[e].to;
       if(dist[v]>dist[u]+E[e].weight){
         dist[v] = dist[u]+E[e].weight;
-        pq.push(PII(dist[v],v));
+        pq.push(Pair(dist[v],v));
       }
     }
   }
