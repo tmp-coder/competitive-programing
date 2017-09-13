@@ -1,5 +1,5 @@
 
-int _idx;
+int _idx;//比较维度
 struct KDNode{
     const static int max_dims = 5;
     int featrue[max_dims];
@@ -47,12 +47,12 @@ struct KDTree{
 
     void k_close(const KDNode& p,int k,int o){
         if(!flag[o])return;
-        int lc = o<<1,rc = o<<1|1;
-        pair<int,KDNode> cur(0,data[o]);
-        for(int i=0 ; i<dims ; ++i)cur.fi+=SQ(p.featrue[i]-data[o].featrue[i]);
         int dim = data[o].dim;
         if(p.featrue[dim] >data[o].featrue[dim])swap(lc,rc);
         if(flag[lc])k_close(p,k,lc);
+        int lc = o<<1,rc = o<<1|1;
+        pair<int,KDNode> cur(0,data[o]);
+        for(int i=0 ; i<dims ; ++i)cur.fi+=SQ(p.featrue[i]-data[o].featrue[i]);
         bool fg = false;//右子树遍历标志
         if(Q.size() < k){
             Q.push(cur);fg =1;
