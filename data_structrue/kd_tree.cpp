@@ -3,22 +3,19 @@ int _idx;//比较维度
 struct KDNode{
     const static int max_dims = 5;
     int featrue[max_dims];
-    int size;
+    int size;//子树节点个数
     int region[max_dims][2];//每个维度最大值最小值
     int dim;
     bool operator < (const KDNode& o)const{
-        return featrue[dim]<o.featrue[dim];
+        return featrue[_idx]<o.featrue[_idx];
     }
 };
 struct KDTree{
-    int dims = 2;
+    int dims;
     KDNode Node[maxn];
     KDNode data[maxn<<2];
     bool flag[maxn<<2];
-    priority_queue<pair<int,KDNode> > Q;
-    static bool cmp(const KDNode& a,const KDNode & b){
-        return a.featrue[_idx] < b.featrue[_idx];
-    }
+    priority_queue<pair<int,KDNode> > Q;//查询结果队列
     void build(int l,int r,int o,int dep,bool clc_region = false){
         //最后一个参数表明是否记录区域大小
         if(l>r)return;
@@ -27,7 +24,7 @@ struct KDTree{
         flag[o] = true;
         flag[lc]=flag[rc] = 0;
         int mid = (l+r) >> 1;
-        nth_element(Node+l,Node+mid,Node+r+1,cmp);
+        nth_element(Node+l,Node+mid,Node+r+1);
         data[o] = Node[mid];data[o].dim = _idx;
         // std::cout <<"node "<< o << '\n';
         // std::cout << _idx << '\n';
@@ -48,9 +45,9 @@ struct KDTree{
     void k_close(const KDNode& p,int k,int o){
         if(!flag[o])return;
         int dim = data[o].dim;
+        int lc = o<<1;int rc = o<<1|1;
         if(p.featrue[dim] >data[o].featrue[dim])swap(lc,rc);
         if(flag[lc])k_close(p,k,lc);
-        int lc = o<<1,rc = o<<1|1;
         pair<int,KDNode> cur(0,data[o]);
         for(int i=0 ; i<dims ; ++i)cur.fi+=SQ(p.featrue[i]-data[o].featrue[i]);
         bool fg = false;//右子树遍历标志
