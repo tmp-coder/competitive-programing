@@ -556,3 +556,293 @@ struct MCMF{
 };
 
 ```
+
+# LCA
+
+
+int st[MAX_V][32];
+//返回下标的RMQ；
+void  RMQ_init(const int *A,int n)
+{
+  for(int i=0 ; i<n ; ++i)st[i][0] = i;
+
+  for(int j = 1 ; (1<<j)<=n ; ++j)
+    for(int i =0 ; i+(1<<j)-1<n ; ++i)
+    if(A[st[i][j-1]]<A[st[i+1<<(j-1)][j-1]])
+      st[i][j] = st[i][j-1];
+    else st[i][j] = st[i+1<<(j-1)][j-1];
+}
+//最小值的下标
+int query(const int *A,int L,int R){
+  if(R<L)return -1;
+  int k=0;
+  while(1<<(k+1)<=R-L+1)k++;
+  if(A[st[L][k]]<A[st[R-(1<<k)+1][k]])
+    return st[L][k];
+  else return st[R-(1<<k)+1][k];
+}
+//LCA
+std::vector<int> G[MAX_V];
+
+struct LCA{
+  int root;
+  int vs[MAX_V<<1];//访问数组
+  int depth[MAX_V<<1]//深度数组
+  int pos[MAX_V];//位置数组
+
+  void dfs(int v,int p,int d,int& k){
+    pos[v] = k;
+    vs[k] = v;
+    depth[k++] = d;
+    for(int i=0 ; i<G[v].size() ; ++i)
+      if(G[v][i] !=p){
+        dfs(G[v][i],v,d+1,k);
+        vs[k] = v;//回退
+        depth[k++] = d;
+      }
+  }
+
+  //预处理
+  void init(int V,int r){
+    int k=0 ;
+    root = r;
+    dfs(root,-1,0,k);
+    RMQ_init(depth,2*V-1);
+  }
+
+  int lca(int u,int v){
+    if(pos[u]>pos[v])swap(u,v);
+    return vs[query(depth,pos[u],pos[v])];
+  }
+};
+
+# clique
+
+# 版本1
+```c++
+#define ctz(x) ((x)? __builtin_ctzll(x):64)
+
+/*计算右边第一个1之后的0的个数
+*最大计算为64,从右边起序号依次为0,1,2,...
+*/
+int ans,n;
+ULL g[maxn];
+//最大团
+void BronKerbosch(ULL clique,ULL allow,ULL forbid){
+    if(!allow && !forbid){
+        ans = max(ans,__builtin_popcountll(clique));return;
+    }
+    if(!allow)return;
+    int pivot = ctz(allow | forbid);//选择轴点
+    ULL choose = allow & ~g[pivot];
+    for(int u = ctz(choose) ; u<n ; u += ctz(choose>>(u+1))+1){
+        BronKerbosch(clique|(1ULL<<u),allow&g[u],forbid&g[u]);
+        allow ^=1ULL<<u;
+        forbid|=1ULL<<u;
+    }
+}
+```
+
+# 版本２
+
+```c++
+const int MAX_V = 55;
+bitset<MAX_V> g[MAX_V],clique,allow,forbid;
+
+
+//暴力枚举
+int ans,n;
+void BronKerbosch(int sz,bitset<MAX_V> allow, bitset<MAX_V> forbid,int begin=0) {
+    if(allow.none()&&forbid.none()){
+        ans = max(ans,sz);
+        return;
+    }
+    if(allow.none())return;
+    int pivot = 0;
+    for(int i=0 ; i<n ; ++i)
+        if(allow[i]|forbid[i]){pivot = i;break;}
+    bitset<MAX_V> choose = allow & (~g[pivot]);
+    for(int u=begin ; u<n ; ++u){
+        if(choose[u]){
+            sz++;
+            BronKerbosch(sz,allow&g[u],forbid&g[u],begin=0);
+            sz--;
+            allow.set(u,0);
+            forbid.set(u);
+        }
+    }
+}
+```
+
+# 版本３
+```c++
+std::vector<int> g[MAX_V];
+
+int mat[maxn][maxn];
+//暴力枚举
+int ans = 0;
+int n,m,s;
+int cnt;
+int Stack[maxn];
+bool ok(int u){
+    for(int i=0 ; i<cnt ; ++i)
+        if(!mat[u][Stack[i]])return 0;
+    return 1;
+}
+void dfs(int u,int idx){
+    if(cnt ==s){ans++;return;}
+    if(g[u].size()+cnt <s|| idx >=g[u].size())return;
+    if(ok(g[u][idx])){
+        Stack[cnt++] = g[u][idx];
+        dfs(u,idx+1);
+        cnt--;
+    }
+    dfs(u,idx+1);
+}
+
+int main()
+{
+    // ios_base::sync_with_stdio(0);
+    // cin.tie(0);
+    // cout.tie(0);
+
+    int T;
+    cin>>T;
+
+    int allow[100];
+    while (T--) {
+        cin>>n>>m>>s;
+        for(int i=0 ; i<n ; ++i)g[i].clear();
+        ms(mat,0);
+        for(int i=0 ; i<m ; ++i){
+            int u,v;
+            scanf("%d%d",&u,&v );
+            u--;v--;
+            if(u==v)continue;
+            mat[u][v] = mat[v][u] =1;
+            g[u].pb(v);
+            g[v].pb(u);
+        }
+        ans =0;
+        for(int i=0 ; i<n ; ++i){
+            cnt =0;
+            Stack[cnt++] = i;
+            dfs(i,0);
+            for(int j=0 ; j<n ; ++j){
+                if(mat[i][j])mat[i][j]=mat[j][i] = 0;
+            }
+        }
+        std::cout << ans << '\n';
+    }
+    return 0;
+}
+
+```
+
+# 最小费用流
+
+
+#define fi first
+#define se second
+
+using namespace std;
+
+typedef long long LL;
+typedef pair<int,int> Pair;
+
+const int maxn = 50;
+const int MAX_V = 2500;
+
+struct Edge{
+  int from,to,cap,cost;
+  Edge(int f,int t,int c,int co):from(f),to(t),cap(c),cost(co){}
+};
+std::vector<Edge> E;
+std::vector<int> G[MAX_V];
+void add_edge(int u,int v,int cap,int cost){
+  E.push_back(Edge(u,v,cap,cost));G[u].push_back(E.size()-1);
+  E.push_back(Edge(v,u,0,-cost)) ;G[v].push_back(E.size()-1);
+}
+struct MCMF{
+  int V;
+  int dist[MAX_V];
+  int pre_E[MAX_V];//最短路径弧
+  bool inq[MAX_V];//spfa判断
+  //未判断负圈
+  void spfa(int s){
+    memset(dist,INF,sizeof(dist));
+    memset(inq,false,sizeof(inq));
+    queue<int> Q;
+    Q.push(s);
+    dist[s] = 0;
+    inq[s] = true;
+    pre_E[s] = -1;
+    while(!Q.empty())
+    {
+      int u = Q.front();Q.pop();
+      inq[u] = false;
+      for(int i=0 ; i<G[u].size() ; ++i){
+        Edge &e = E[G[u][i]];
+        if(e.cap>0&&dist[e.to]>dist[u]+e.cost){
+          dist[e.to] = dist[u]+e.cost;
+          pre_E[e.to] = G[u][i];
+          if(!inq[e.to]){Q.push(e.to);inq[e.to] = true;}
+        }
+      }
+    }
+  }
+
+  int min_cost_flow(int s,int t,int f){
+    int res = 0;
+    while (f>0) {
+      spfa(s);
+      if(dist[t]==INF) break;//不能增广
+      //沿着最短路增广
+      int d = f;
+      for(int i = pre_E[t] ; i!=-1 ;i = pre_E[E[i].from])d = min(d,E[i].cap);
+      f-=d;
+      res+=d*dist[t];
+      for(int i = pre_E[t] ; i!=-1 ;i = pre_E[E[i].from]){
+        E[i].cap-=d;
+        E[i^1].cap+=d;
+      }
+    }
+    return res;
+  }
+};
+
+MCMF mcf;
+
+int a[maxn][maxn];
+int main(int argc, char const *argv[]) {
+  int N,M;
+  while (scanf("%d%d",&N,&K )!=EOF) {
+    for(int i=0 ; i<N ; ++i)
+      for(int j=0 ; j<M ; ++j)
+        scanf("%d",&a[i][j] );
+    int ans  = a[0][0]+a[N-1][M-1];
+    int s = N*M,t = s+1;
+    E.clear();
+    for(int i=0 ; i<= t  ; ++i)G[i].clear();
+    for(int i=0 ; i<N ; ++i){
+      for(int j = 0 ; j<M ; ++j){
+        int u = i*M+j,v1 = u+1,v2 = (i+1)*N+j;
+        if(j!=M-1){
+          add_edge(u,v1,1,-a[i][j+1]);
+          add_edge(u,v1,INF,0);
+        }
+        if(i!=N-1){
+          add_edge(u,v2,1,-a[i+1][j]);
+          add_edge(u,v2,INF,0);
+        }
+      }
+    }
+    add_edge(N*M-1,t,K,0);
+    add_edge(s,0,K,0);
+    ans+=(-mcf.min_cost_flow(s,t,K));
+    std::cout << ans << '\n';
+  }
+
+
+  return 0;
+}
