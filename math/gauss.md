@@ -1,5 +1,5 @@
-gauss消元模板
-#gauss_jordan对角消元
+# gauss消元模板
+# gauss_jordan对角消元
 ```c++
 typedef double Matrix[maxn][maxn];
 int n;
@@ -20,7 +20,7 @@ void gauss_jordan(Matrix A,int n){
 }
 ```
 
-#异或方程组消元求秩
+# 异或方程组消元求秩
 
 ```c++
 int my_rank(Matrix &A, int m,int n){
