@@ -1,8 +1,6 @@
-# ACM_code
-
 这是我个人的ACM模板, 以及相关学习资料，论文、blog。本人JNU Cu菜鸡 :).
 
-retied :(
+retired :(
 
 # ACM 竞赛经历
 
@@ -15,3 +13,11 @@ retied :(
 1. ACM 并非没用，今年暑假参加秋招什么都没准备，过了bytedance的后端，20k，心里乐疯了，保研的时候也看到了老师对这个的认可！！！
 2. 个人对算法还很有兴趣
 3. 算法题目带来的是一种思维的训练，它的中心是计算机科学的核心，time& space trade off这种训练很难说什么时候有用，什么时候没用，但吃的饭总是有用的。
+
+----------------------12/29/2018 update----------------------------
+
+**一些个人算法(competitive-programing) 相关的blog**
+
+- [个人csdn算法刷题总结](https://blog.csdn.net/dylan_frank/article/category/7400564)
+- [个人csdn算法学习总结](https://blog.csdn.net/dylan_frank/article/category/7542029)
+- [当前blog算法学习总结](https://zouzhitao.github.io/categories/competitive-programing/)
