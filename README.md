@@ -1,4 +1,4 @@
-这是我个人的ACM模板, 以及相关学习资料，论文、blog。本人JNU Cu菜鸡 :).
+这是我个人的ACM模板, 以及相关学习资料，论文、blog。本人Cu菜鸡 :).
 
 retired :(
 
@@ -21,3 +21,4 @@ retired :(
 - [个人csdn算法刷题总结](https://blog.csdn.net/dylan_frank/article/category/7400564)
 - [个人csdn算法学习总结](https://blog.csdn.net/dylan_frank/article/category/7542029)
 - [当前blog算法学习总结](https://zouzhitao.github.io/categories/competitive-programing/)
+- [google kick start 2018-2019题目解析](https://blog.csdn.net/Dylan_Frank/column/info/34402)
