@@ -21,4 +21,10 @@ retired :(
 - [个人csdn算法刷题总结](https://blog.csdn.net/dylan_frank/article/category/7400564)
 - [个人csdn算法学习总结](https://blog.csdn.net/dylan_frank/article/category/7542029)
 - [当前blog算法学习总结](https://zouzhitao.github.io/categories/competitive-programing/)
-- [google kick start 2018-2019题目解析](https://xiaozhuanlan.com/kickstart)
+- [google kick start 2018-2019题目解析](https://blog.csdn.net/Dylan_Frank/column/info/34402)
+
+# coding 面试经历:
+
+- [字节跳动后台开发](https://www.nowcoder.com/discuss/95675)
+- [商汤 平台开发工程师](https://zouzhitao.github.io/posts/sensetime-ai-platform-engineer-interview/)
+- [MSRA SA Research Intern](https://www.nowcoder.com/discuss/147904)
