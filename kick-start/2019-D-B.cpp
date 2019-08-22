@@ -47,9 +47,20 @@ void solve(){
     vector<int> timep(N,-1);
     int not_vis = N;
     if(M > N) M = N;
+
+    vector<bool> vis(2*N,false);
+
+    set<int> unseen;
+    for(int i=0 ; i< gg.size() ; ++i)unseen.insert(i);
     for(int time = M ; time >= 0 && not_vis>0 ; --time)
     {
-        for(int i=0 ; i< gg.size() ; ++i){
+        vector<int >del;
+        for(auto i : unseen){
+            int status = (gg[i].cur << 1) + (gg[i].dir==1);
+            if(vis[status]){
+                del.push_back(i);
+                continue;
+            }else vis[status] =true;
             int & cur = gg[i].cur;
             if(timep[cur]<time){
                 not_vis--;
@@ -60,6 +71,7 @@ void solve(){
             }
             gg[i].cur= (cur + gg[i].dir + N) % N;
         }
+        for(auto e : del)unseen.erase(e);
     }
     vector<int> ans(G);
     for(auto e: gg){
